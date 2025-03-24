@@ -1,5 +1,7 @@
 # 2024 NFL Team Info
 
+![alt text](./docs/schema_visualization.png)
+
 ## Setup 
 
 ### Create a venv
@@ -32,6 +34,12 @@ python importer.py
 
 
 ## Example Queries
+
+### Get the metadata
+```
+CALL db.schema.visualization();
+```
+
 ### Get all data
 ```
 MATCH (n) RETURN n;
