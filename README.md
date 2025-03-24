@@ -29,7 +29,7 @@ python importer.py
 ```
 
 ### View in neo4j
-1. Connect to your instance (defaults to http://localhost:7474/browser/
+1. Connect to your instance (defaults to http://localhost:7474/browser/)
 1. Run some queries!
 
 
@@ -43,6 +43,22 @@ CALL db.schema.visualization();
 ### Get all data
 ```
 MATCH (n) RETURN n;
+```
+
+### Get the Positions for Players on a Team
+```
+MATCH (p:Player)-[:PLAYS_FOR]->(lions:Team {id: 'detroit_lions'})
+MATCH (p)-[:PLAYS]->(pos:Position)
+RETURN p, pos
+```
+
+### What College has the most pro QBs?
+```
+MATCH (c:College)-[:ATTENDED]-(p:Player)-[:PLAYS]->(pos:Position {name: 'QB'})
+WITH pos, c, COUNT(p) as PlayerCount
+ORDER BY PlayerCount DESC
+RETURN pos.name, c.name, PlayerCount
+LIMIT 5;
 ```
 
 ### Get all players from Alabama on either the Packers or Lions
@@ -87,6 +103,26 @@ MATCH (c:College {name: top_college.college.name})
 MERGE (d)-[f:FAVORS]->(c)
 SET f.count = top_college.count
 RETURN d, c, f;
+```
+
+### Do Dome Teams Win in 'Open' Stadiums?
+```
+MATCH (domeTeam:Team)-[:PLAYS_AT]->(dome:Stadium {roof_type: 'dome'})
+MATCH (domeTeam)-[awayRel:WAS_AWAY]->(awayGame:Game)
+MATCH (homeTeam:Team)-[homeRel:WAS_HOME]->(awayGame)
+MATCH (awayGame)-[:PLAYED_AT]->(awayStadium {roof_type: 'open'})
+WITH domeTeam, awayGame, homeTeam, awayRel.score AS awayScore, homeRel.score AS homeScore
+ORDER BY awayGame.date ASC
+RETURN 
+  awayGame.date, 
+  homeTeam.name as HomeTeam, 
+  domeTeam.name as DomeTeam, 
+  awayScore > homeScore as DomeTeamWonInOpenAir,
+  CASE 
+    WHEN awayScore > homeScore THEN domeTeam.name
+    WHEN homeScore > awayScore THEN homeTeam.name
+    ELSE 'Tie Game'
+  END AS Winner;
 ```
 
 

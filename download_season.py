@@ -1,8 +1,6 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import matplotlib.pyplot as plt
-import seaborn as sns
 import re
 import os
 import time

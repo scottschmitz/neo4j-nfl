@@ -14,9 +14,14 @@ class RosterLoader:
       roster_file_path: Path to roster CSV file
       games_file_path: Path to games CSV file
     """
+    print(f"Loading data for {team_id} in {season_year}...")
+    
     # Read CSV files
     roster_df = pd.read_csv(roster_file_path)
     games_df = pd.read_csv(games_file_path)
+
+    # Load positions
+    self._load_positions(roster_df)
 
     # Load colleges
     self._load_colleges(roster_df)
@@ -26,6 +31,27 @@ class RosterLoader:
 
     # Load games
     self._load_games(games_df, season_year, team_id)
+
+    print(f"✅ {team_id} complete.")
+
+  def _load_positions(self, roster_df):
+    """Extract and create position nodes"""
+    # Extract unique positions
+    positions = set()
+    for position_list in roster_df['Pos'].dropna():
+      for position in position_list.replace('"', '').split(','):
+        clean_position = position.strip()
+        if clean_position:
+          positions.add(clean_position)
+        
+    # Create positions in batch
+    for i in range(0, len(positions), 50):  # Process in batches of 50
+      batch = list(positions)[i:i+50]
+      query = """
+        UNWIND $positions AS position_name
+        MERGE (p:Position {name: position_name});
+      """
+      self.db.run_query(query, {"positions": batch})
         
   def _load_colleges(self, roster_df):
     """Extract and create college nodes"""
@@ -105,6 +131,16 @@ class RosterLoader:
             MERGE (p)-[:ATTENDED]->(c)
           """
           self.db.run_query(query, {"player_id": player_id, "colleges": colleges})
+
+      if not pd.isna(row['Pos']):
+        pos = row['Pos'].strip()
+        if pos:
+          query = """
+            MATCH (p:Player {id: $player_id})
+            MATCH (pos:Position {name: $position})
+            MERGE (p)-[:PLAYS]->(pos)
+          """
+          self.db.run_query(query, {"player_id": player_id, "position": pos})
     
   def _load_games(self, games_df, season_year, team_id):
     """Create game nodes and relationships"""
