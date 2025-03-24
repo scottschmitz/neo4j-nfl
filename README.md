@@ -2,17 +2,46 @@
 
 ![alt text](./docs/schema_visualization.png)
 
-## Setup 
+## Running the Docker Image
+```
+docker compose up -d
+```
+
+## Asking Questions
+```
+cd llm
+python -m venv neo4f-nfl
+pip install -r requirements.txt
+
+python nfl_bot.py
+```
+
+After running the command you may begin asking question such as
+```
+> Who plays QB for the Bills?
+
+
+> Entering new GraphCypherQAChain chain...
+Generated Cypher:
+MATCH (p:Player)-[:PLAYS_FOR]->(team:Team {id: 'buffalo_bills'})
+MATCH (p)-[:PLAYS]->(pos:Position {name: 'QB'})
+RETURN p
+Full Context:
+[{'p': {'number': '17.0', 'birthdate': '5211996', 'last_name': 'Allen', 'id': 'allen_josh_5211996', 'first_name': 'Josh'}}, {'p': {'number': '11.0', 'birthdate': '8201994', 'last_name': 'Trubisky', 'id': 'trubisky_mitchell_8201994', 'first_name': 'Mitchell'}}, {'p': {'number': '14.0', 'birthdate': '3251995', 'last_name': 'White', 'id': 'white_mike_3251995', 'first_name': 'Mike'}}]
+
+> Finished chain.
+{'p': {'number': '17.0', 'birthdate': '5211996', 'last_name': 'Allen', 'id': 'allen_josh_5211996', 'first_name': 'Josh'}}, 
+{'p': {'number': '11.0', 'birthdate': '8201994', 'last_name': 'Trubisky', 'id': 'trubisky_mitchell_8201994', 'first_name': 'Mitchell'}}, 
+{'p': {'number': '14.0', 'birthdate': '3251995', 'last_name': 'White', 'id': 'white_mike_3251995', 'first_name': 'Mike'}}
+```
+
+## Importing Data
 
 ### Create a venv
 ```
-python -m venv nfl
+cd importer
+python -m venv neo4f-nfl
 pip install -r requirements.txt
-```
-
-### Run the Docker image
-```
-docker compose up -d
 ```
 
 ### Setup .env

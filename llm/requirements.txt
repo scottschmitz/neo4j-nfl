@@ -1,0 +1,2 @@
+langchain-neo4j==0.4.0
+langchain-ollama==0.2.3
