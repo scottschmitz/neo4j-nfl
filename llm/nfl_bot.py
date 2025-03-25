@@ -1,20 +1,23 @@
 import os
+from google import genai
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_neo4j import GraphCypherQAChain, Neo4jGraph
 from langchain.prompts import PromptTemplate
-from langchain_ollama import ChatOllama
 
 from dotenv import load_dotenv
-load_dotenv()
-
-llm = ChatOllama(model="llama3.2")
-
-# Load environment variables from .env
 load_dotenv()
 
 # Get credentials from environment variables
 NEO4J_URI = os.getenv("NEO4J_URI")
 NEO4J_USER = os.getenv("NEO4J_USER")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+
+os.environ["GOOGLE_API_KEY"] = GEMINI_API_KEY
+llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+
+
 
 graph = Neo4jGraph(
     url=NEO4J_URI,
@@ -124,13 +127,26 @@ Question: {question}
 """
 
 RESPONSE_TEMPLATE = """
-Given the following Cypher query results, assume that the results are correct and are 
-related to the query. If the query is asking about movies, and it is a list of movies,
-then assume the list is correct. Provide the response in an easy to read sentence or two.
+You are tasked with reformatting a Cypher query result into a friendly, readable message. The original question and the Cypher result are provided to you. 
+Your job is to present this information in a clear, concise manner without adding any additional data or performing any extra calculations. Do not use
+any external knowledge beyond the information provided in the Cypher result.
 
-Results: {context}
+Here is the original question that was asked:
+<original_question>
+{question}
+</original_question>
 
-Respond with only the results exactly as they appear above, with no additional text or explanations.
+Here is the Cypher query result:
+<cypher_result>
+{context}
+</cypher_result>
+
+To format your response:
+1. Start by addressing the original question directly.
+2. Present the information from the Cypher result in a natural, conversational tone.
+3. Be concise. Limit yourself to 1-3 sentences.
+4. Do not add any information that is not present in the Cypher result.
+5. If the Cypher result is empty or doesn't provide a clear answer to the original question, state this clearly.
 """
 
 cypher_generation_prompt = PromptTemplate(

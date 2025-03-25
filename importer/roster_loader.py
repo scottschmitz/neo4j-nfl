@@ -148,7 +148,7 @@ class RosterLoader:
     home_games = games_df[games_df['Location'].isna() & ~games_df['Day'].isna() & (games_df['Day'] != '')]
         
     for _, row in home_games.iterrows():
-      opponent = str(row['Opp']).lower().replace(' ', '_')
+      opponent = str(row['Opp']).lower().replace(' ', '_').replace('.', '')
       game_id = f"{season_year}_week_{row['Week']}_{team_id}_{opponent}"
             
       # Scores
@@ -161,12 +161,15 @@ class RosterLoader:
       ON CREATE SET
         g.date = $date,
         g.time = $time,
-        g.dayOfWeek = $day_of_week
+        g.dayOfWeek = $day_of_week,
+        g.homeTeam = $team_id,
+        g.awayTeam = $opp_id,
+        g.homeScore = $home_score,
+        g.awayScore = $away_score
           
       WITH g
       MATCH (home_team:Team {id: $team_id})
       MERGE (home_team)-[home:WAS_HOME]->(g)
-      ON CREATE SET home.score = $home_score
       
       WITH g
       MATCH (w:Week {id: $week_id})
@@ -183,13 +186,14 @@ class RosterLoader:
         "time": row['Time'],
         "day_of_week": row['Day'],
         "team_id": team_id,
+        "opp_id": opponent,
         "home_score": home_score,
+        "away_score": away_score,
         "week_id": f"{season_year}_week_{int(row['Week'])}"
       }
       self.db.run_query(query, params)
       
-      # Connect away team
-      normalized_opp = str(row['Opp']).lower().replace(' ', '_').replace('.', '')
+      # Connect away team      
       query = """
       MATCH (g:Game {gameId: $game_id})
       MATCH (awayTeam:Team)
@@ -197,11 +201,9 @@ class RosterLoader:
         REPLACE(LOWER(awayTeam.name), ' ', '_') = $opp_id OR
         REPLACE(LOWER(awayTeam.full_name), ' ', '_') = $opp_id
       MERGE (awayTeam)-[away:WAS_AWAY]->(g)
-      ON CREATE SET away.score = $away_score
       """
       params = {
         "game_id": game_id,
-        "opp_id": normalized_opp,
-        "away_score": away_score
+        "opp_id": opponent
       }
       self.db.run_query(query, params)

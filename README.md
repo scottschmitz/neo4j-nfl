@@ -7,10 +7,21 @@
 docker compose up -d
 ```
 
+## Setup the Environment (.env)
+Create a `.env` file at the root of the project. This project is setup to use a [Google Gemini API key which you can generate here.](https://ai.google.dev/gemini-api/docs/api-key) Your `.env` file should look something like below.
+```
+NEO4J_URI=neo4j://localhost
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=YOUR_PASSWORD
+GEMINI_API_KEY=YOU_API_KEY
+```
+
 ## Asking Questions
 ```
 cd llm
-python -m venv neo4f-nfl
+python -m venv neo4f-nfl-llm
+source neo4j-nfl-llm/bin/activate
+
 pip install -r requirements.txt
 
 python nfl_bot.py
@@ -41,15 +52,9 @@ Full Context:
 ```
 cd importer
 python -m venv neo4f-nfl
-pip install -r requirements.txt
-```
+source neo4j-nfl/bin/activate
 
-### Setup .env
-Create a `.env` file at the root of the project. It should look something like below.
-```
-NEO4J_URI=neo4j://localhost
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=YOUR_PASSWORD
+pip install -r requirements.txt
 ```
 
 ### Call the importer

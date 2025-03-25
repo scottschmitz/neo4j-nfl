@@ -1,2 +1,6 @@
 langchain-neo4j==0.4.0
-langchain-ollama==0.2.3
+langchain-google-genai==2.1.1
+google-genai==1.7.0
+pinecone-plugin-interface==0.0.7
+numpy==2.2.4
+dotenv--0.9.9
