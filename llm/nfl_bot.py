@@ -79,6 +79,12 @@ When searching for a team make sure to always search by its id. The following ar
 
 Examples: 
 
+What players did the Saints draft in 2023?
+MATCH (:Draft{{year: 2023}})-[:HAS_ROUND]->(:Round)-[:HAS_PICK]->(pick:Pick)
+MATCH (team:Team {{id: 'new_orleans_saints'}})-[:OWNS_PICK]->(pick)
+MATCH (pick)-[:SELECTED]->(player:Player)
+RETURN pick, player
+
 Get Players and their Positions for the Lions:
 MATCH (p:Player)-[:PLAYS_FOR]->(lions:Team {{id: 'detroit_lions'}})
 MATCH (p)-[:PLAYS]->(pos:Position)
@@ -165,7 +171,7 @@ cypher_chain = GraphCypherQAChain.from_llm(
     cypher_prompt=cypher_generation_prompt,
     qa_prompt=response_prompt,
     validate_cypher=True,
-    verbose=True,
+    verbose=False,
     allow_dangerous_requests=True
 )
 

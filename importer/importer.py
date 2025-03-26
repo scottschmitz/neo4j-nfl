@@ -4,6 +4,7 @@ from neo4j_helper import Neo4jHelper
 from setup_nfl_league_info import NFLLeagueInfo
 from setup_year import NflSeasonYear
 from rosters_loader import RostersLoader
+from drafts_loader import DraftsLoader
 import os
 
 # Load environment variables from .env
@@ -30,6 +31,7 @@ NFLLeagueInfo(db).create()
 
 RostersLoader(db).load_all_rosters()
 
+DraftsLoader(db).load_all_drafts()
 
 # Close the connection when done
 db.close()

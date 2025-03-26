@@ -87,11 +87,12 @@ class RosterLoader:
                 
       # Extract name parts
       name_parts = str(row['Player']).split(' ')
-      last_name = name_parts[-1] if len(name_parts) > 0 else ''
       first_name = name_parts[0] if len(name_parts) > 0 else ''
+      last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+      last_name_cleaned = last_name.lower().replace(' ', '_')
     
       # Create player ID
-      player_id = f"{last_name.lower()}_{first_name.lower()}_{formatted_date}"
+      player_id = f"{first_name.lower()}_{last_name_cleaned.lower()}_{formatted_date}"
     
       # Jersey number
       number = None if pd.isna(row['No.']) else str(row['No.'])

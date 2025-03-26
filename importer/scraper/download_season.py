@@ -63,7 +63,7 @@ pd.set_option('display.max_columns', None)
 
 year = 2024
 team_abbrs = [
-  # 'buf', 'mia', 'nyj', 'nwe', # ACF East
+  'buf', 'mia', 'nyj', 'nwe', # ACF East
   'rav', 'cin', 'cle', 'pit', # ACF North
   'htx', 'clt', 'jax', 'oti', # ACF South
   'den', 'kan', 'rai', 'sdg', # ACF West
@@ -114,7 +114,7 @@ headers = {
 
 # Automatically sleeps to stay within rate limits (20 requests per minute)
 for team_abbr in team_abbrs:
-  output_dir = f'rawdata/{year}/{team_abbr_to_id[team_abbr]}'
+  output_dir = f'rawdata/{year}/team/{team_abbr_to_id[team_abbr]}'
   os.makedirs(output_dir, exist_ok=True)
 
   print(f"Pulling data for {team_abbr}...")
